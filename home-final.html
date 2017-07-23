@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Siidex 2017</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+
+  
+  </head>
+  <body>
+	  
+	  <div class="container">
+	  	<center>
+				<h1>Home Monitoring System - Initialstate</h1>
+				<center><img src="http://192.168.0.10:8080/?action=stream" 
+				class="img-responsive" alt="" style="border:5px solid black">
+                <hr>
+                <img src="http://192.168.43.27/?action=stream" 
+				class="img-responsive" alt="" style="border:5px solid black">
+                <hr>
+                
+          
+                 <div class="btn-group-vertical">
+                <button class="btn btn-primary" id="up" >Up</button>
+                 <button class="btn btn-info" id="down" >Down</button>
+                 
+
+				</div>
+				<button class="btn btn-success" id="center" >Center</button>
+				
+				  <div class="btn-group">
+				<button class="btn btn-warning" id="left" >Left</button>
+                 <button class="btn btn-danger" id="right" >Right</button>
+
+				</div>
+				
+				 <div class="btn-group-vertical">
+                <button class="btn btn-success" id="auto" >Auto</button>
+                 <button class="btn btn-info" id="manual" >Manual</button>
+                 
+                 <hr>
+                 
+                 Input interval: <input type="text" name="interval" value=""><br>
+                 <button class="btn btn-info" type="submit" value='send'>Submit Interval</button>
+
+				</div>
+				
+				
+				<h3><a href="https://app.initialstate.com/#/tiles">InitialState</a></h3>
+				<iframe src="https://app.initialstate.com/#/tiles" height=320 width=100%></iframe>
+               
+
+               
+               
+			<label class="label label-danger" id="console-red"></label>
+			<label class="label label-success" id="console-green"></label>
+			<label class="label label-info" id="console-blue"></label>
+
+
+
+
+			<hr>
+			
+
+
+				<label class="checkbox-inline">
+				<input type="checkbox"  type="checkbox" data-toggle="toggle"
+				data-on="ON" data-off="OFF" data-onstyle="danger" id="red"> Red
+				</label>
+
+
+				<label class="checkbox-inline">
+				<input type="checkbox"  type="checkbox" data-toggle="toggle"
+				data-on="ON" data-off="OFF" data-onstyle="success" id="green"> Green
+				</label>
+
+
+				<label class="checkbox-inline">
+				<input type="checkbox"  type="checkbox" data-toggle="toggle"
+				data-on="ON" data-off="OFF" data-onstyle="info" id="blue"> Blue
+				</label>
+				
+				<hr>
+				
+				<label class="checkbox">
+				<input type="checkbox"  type="checkbox" data-toggle="toggle"
+				data-on="Relay ON" data-off="Relay OFF" data-onstyle="warning" id="relay1"> Relay 1
+				</label>
+				<label class="checkbox">
+				<input type="checkbox"  type="checkbox" data-toggle="toggle"
+				data-on="Relay ON" data-off="Relay OFF" data-onstyle="danger" id="relay2"> Relay 2
+				</label>
+				
+				
+				</center>
+                
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename="vendor/jquery/jquery.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/socket.io.min.js") }}"></script>
+   
+    
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    
+     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+     
+
+     
+  </body>
+  
+  <script>
+	
+	var socket = io.connect();
+	socket.on('connect', function() {
+	console.log('SocketIO is running!')
+	console.log('SiideX 2017 UiTM Ready!')
+	});
+	
+	$("#console-red").html('RED');
+		$("#console-green").html('GREEN');
+			$("#console-blue").html('BLUE');
+
+
+	$('#auto').click(function() {
+		socket.emit('LEDcontrol','auto')
+	  
+	  console.log('auto');
+	});
+	
+	$('#manual').click(function() {
+		socket.emit('LEDcontrol','manual')
+	  
+	  console.log('manual');
+	});
+	
+	
+	 // Setup button click handlers.
+	$('#up').click(function() {
+	  $.post('/servo/up');
+	  console.log('up');
+	});
+	$('#down').click(function() {
+	  $.post('/servo/down');
+	  	  console.log('down');
+
+	});
+		$('#left').click(function() {
+	  $.post('/servo/left');
+	  	  console.log('left');
+
+	});
+		$('#right').click(function() {
+	  $.post('/servo/right');
+	  	  console.log('right');
+
+	});
+		$('#center').click(function() {
+	  $.post('/servo/center');
+	  	  console.log('center');
+
+	});
+
+	
+	$(function() {
+    $('#relay1').change(function() {
+	$.post('/relay/relay1toggle');
+	
+    })
+	});//close func
+	
+	$(function() {
+    $('#relay2').change(function() {
+	$.post('/relay/relay2toggle');
+	//socket.emit('relay1',$(this).prop('checked'))
+	//console.log('relay1: ' + $(this).prop('checked'));
+    })
+	});//close func
+	
+
+	
+	$(function() {
+    $('#red').change(function() {
+	socket.emit('setred',$(this).prop('checked'));
+	if ($(this).prop('checked')){
+	$("#blue").bootstrapToggle('disable');
+	$("#green").bootstrapToggle('disable');    
+	}
+	else{
+	$("#blue").bootstrapToggle('enable');
+	$("#green").bootstrapToggle('enable');    
+	}
+      
+    $('#console-red').html('Red: ' + $(this).prop('checked'))
+    })
+	});//close func
+
+
+	$(function() {
+    $('#green').change(function() {
+      socket.emit('setgreen',$(this).prop('checked'));
+      if ($(this).prop('checked')){
+	$("#red").bootstrapToggle('disable');
+	$("#blue").bootstrapToggle('disable');    
+	}
+	else{
+	$("#red").bootstrapToggle('enable');
+	$("#blue").bootstrapToggle('enable');    
+	}
+    $('#console-green').html('Green: ' + $(this).prop('checked'))
+    })
+	});//close func
+
+
+	$(function() {
+    $('#blue').change(function() {
+	socket.emit('setblue',$(this).prop('checked'));
+	if ($(this).prop('checked')){
+	$("#red").bootstrapToggle('disable');
+	$("#green").bootstrapToggle('disable');    
+	}
+	else{
+	$("#red").bootstrapToggle('enable');
+	$("#green").bootstrapToggle('enable');    
+	}
+    $('#console-blue').html('Blue: ' + $(this).prop('checked'))
+    })
+	});//close func
+
+
+  </script>
+</html>
